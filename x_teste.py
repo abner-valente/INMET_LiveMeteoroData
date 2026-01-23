@@ -34,13 +34,29 @@ with sync_playwright() as p:
     pagina.click('//*[@id="root"]/div[2]/div[1]/div[2]/div[3]/input')
     time.sleep(1)
     
-    #Selecionar a primeira estação da lista
-    pagina.click('//*[@id="root"]/div[2]/div[1]/div[2]/div[3]/div[2]/div[2]')
-    time.sleep(1)
+    estacoes = pagina.locator('//*[@id="root"]/div[2]/div[1]/div[2]/div[3]/div[2]/div').all()
+    total_estacoes = len(estacoes)
     
-    #clicar para gerar a tabela
-    pagina.click('//*[@id="root"]/div[2]/div[1]/div[2]/button')
-    time.sleep(5)
+    # Agora você pode iterar
+    for i in range(total_estacoes): 
+        print(f"Baixando dados da estação {i-1}/{total_estacoes}")
+        
+        if i > 1 :
+            #Clicar pra abrir a lista da esquerda
+            pagina.click('//*[@id="root"]/div[1]/div[1]/i')
+        
+            # Reabre a lista de estações (caso tenha fechado)
+            pagina.click('//*[@id="root"]/div[2]/div[1]/div[2]/div[3]/input')
+            time.sleep(1)
+        
+        # Seleciona a estação atual
+        pagina.click(f'//*[@id="root"]/div[2]/div[1]/div[2]/div[3]/div[2]/div[{i}]')
+        time.sleep(1)
+    
+    
+        #clicar para gerar a tabela
+        pagina.click('//*[@id="root"]/div[2]/div[1]/div[2]/button')
+        time.sleep(5)
     
     #clicar para baixar a tabela em CSV e capturar o download
     with pagina.expect_download() as download_info:
