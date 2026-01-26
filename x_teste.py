@@ -2,6 +2,8 @@ import time
 import os
 from pathlib import Path
 from playwright.sync_api import sync_playwright
+from datetime import datetime
+import re
 
 URL = "https://tempo.inmet.gov.br/TabelaEstacoes/"
 
@@ -10,6 +12,14 @@ pasta_downloads = os.path.join(os.path.dirname(__file__), "downloads")
 
 # Cria a pasta se não existir
 os.makedirs(pasta_downloads, exist_ok=True)
+
+def _slugify_filename(name):
+    name = name.strip() if isinstance(name, str) else ""
+    # Substitui caracteres inválidos no Windows e normaliza espaços
+    name = re.sub(r'[\\/*?:"<>|]', '_', name)
+    name = re.sub(r'\s+', '_', name)
+    # Limita tamanho para evitar problemas de caminho
+    return name[:120] or "arquivo"
 
 with sync_playwright() as p:
     navegador = p.chromium.launch(headless=False)
@@ -38,7 +48,7 @@ with sync_playwright() as p:
     total_estacoes = len(estacoes)
     
     # Agora você pode iterar
-    for i in range(total_estacoes): 
+    for i in range(1, total_estacoes): 
         print(f"Baixando dados da estação {i-1}/{total_estacoes}")
         
         if i > 1 :
@@ -46,11 +56,18 @@ with sync_playwright() as p:
             pagina.click('//*[@id="root"]/div[1]/div[1]/i')
         
             # Reabre a lista de estações (caso tenha fechado)
-            pagina.click('//*[@id="root"]/div[2]/div[1]/div[2]/div[3]/input')
-            time.sleep(1)
+            pagina.click('//*[@id="root"]/div[2]/div[1]/div[2]/div[3]')
+            time.sleep(1)        
         
         # Seleciona a estação atual
         pagina.click(f'//*[@id="root"]/div[2]/div[1]/div[2]/div[3]/div[2]/div[{i}]')
+        
+        try:
+            nome_estacao = pagina.locator(f'//*[@id="root"]/div[2]/div[1]/div[2]/div[3]/div[2]/div[{i}]').inner_text()
+        except Exception:
+            nome_estacao = ""
+        
+        print(nome_estacao)
         time.sleep(1)
     
     
@@ -58,17 +75,26 @@ with sync_playwright() as p:
         pagina.click('//*[@id="root"]/div[2]/div[1]/div[2]/button')
         time.sleep(5)
     
-    #clicar para baixar a tabela em CSV e capturar o download
-    with pagina.expect_download() as download_info:
-        pagina.click('//*[@id="root"]/div[2]/div[2]/div/div/div/span/a')
-    
-    download = download_info.value
-    
-    # Salva o arquivo na pasta Downloads
-    caminho_arquivo = os.path.join(pasta_downloads, download.suggested_filename)
-    download.save_as(caminho_arquivo)
-    
-    print(f"Arquivo baixado com sucesso: {caminho_arquivo}")
+        #clicar para baixar a tabela em CSV e capturar o download
+        with pagina.expect_download() as download_info:
+            pagina.click('//*[@id="root"]/div[2]/div[2]/div/div/div/span/a')
+        
+        download = download_info.value
+
+        
+        if not nome_estacao:
+            # Fallback: usa o nome sugerido (sem extensão) caso o input não esteja acessível
+            nome_estacao = os.path.splitext(download.suggested_filename)[0]
+
+        safe_name = _slugify_filename(nome_estacao)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        custom_filename = f"{safe_name}_{timestamp}.csv"
+
+        # Salva o arquivo na pasta Downloads com nome customizado
+        caminho_arquivo = os.path.join(pasta_downloads, custom_filename)
+        download.save_as(caminho_arquivo)
+
+        print(f"Arquivo baixado com sucesso: {caminho_arquivo}")
     
     navegador.close()
     
