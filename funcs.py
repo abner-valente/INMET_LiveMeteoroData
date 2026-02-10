@@ -1,24 +1,16 @@
 from playwright.sync_api import sync_playwright
 import time
 import re
-<<<<<<< HEAD
 import pandas as pd
 
 
 
 def _slugify_filename(name: str) -> str:
-=======
-
-
-
-def _slugify_filename(name):
->>>>>>> 9978339c2a1e1779bdc627e6528029ca1b0f1ddc
     name = name.strip() if isinstance(name, str) else ""
     # Substitui caracteres inválidos no Windows e normaliza espaços
     name = re.sub(r'[\\/*?:"<>|]', '_', name)
     name = re.sub(r'\s+', '_', name)
     # Limita tamanho para evitar problemas de caminho
-<<<<<<< HEAD
     return name[:120] or "arquivo"
 
 def mdf_df_estacao(nome_estacao: str, df: pd.DataFrame, df_loc_estacoes: pd.DataFrame) -> pd.DataFrame:
@@ -63,6 +55,3 @@ def mdf_df_estacao(nome_estacao: str, df: pd.DataFrame, df_loc_estacoes: pd.Data
         
         
     return df
-=======
-    return name[:120] or "arquivo"
->>>>>>> 9978339c2a1e1779bdc627e6528029ca1b0f1ddc
