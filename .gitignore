@@ -1,3 +1,7 @@
 /downloads
 /pytest_cache
 automation_log.log
+.env
+/.vscode
+__pycache__/
+*.pyc

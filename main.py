@@ -6,7 +6,7 @@ from playwright.sync_api import sync_playwright
 from playwright._impl._errors import TimeoutError
 from datetime import datetime
 import logging
-import re
+import pandas as pd
 
 logging.basicConfig(
     level=logging.INFO,
@@ -17,6 +17,7 @@ logging.basicConfig(
     )
 
 URL = "https://tempo.inmet.gov.br/TabelaEstacoes/"
+
 
 # Define a pasta de saída dentro do projeto
 pasta_downloads = os.path.join(os.path.dirname(__file__), "downloads")
