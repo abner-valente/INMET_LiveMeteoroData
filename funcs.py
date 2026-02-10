@@ -1,6 +1,7 @@
 from playwright.sync_api import sync_playwright
 import time
 import re
+import pandas as pd
 
 
 
@@ -12,11 +13,45 @@ def _slugify_filename(name: str) -> str:
     # Limita tamanho para evitar problemas de caminho
     return name[:120] or "arquivo"
 
-def insert_cod_estacao(nome_estacao: str) -> str:
+def mdf_df_estacao(nome_estacao: str, df: pd.DataFrame, df_loc_estacoes: pd.DataFrame) -> pd.DataFrame:
     if nome_estacao:
-        try:
-            cod_estacao = nome_estacao.split('(')[1].split(')')[0]
-            return cod_estacao
-        except Exception:
-            return ""
-    return ""
+        match = re.search(r'\(([SA]\d{3})\)', nome_estacao)
+        if match:
+            cod_estacao = match.group(1)
+            df['cod_estacao'] = cod_estacao
+            
+        #renomeando colunas
+        df.rename(columns ={"Data": "data",
+                            "Hora (UTC)": "hora_utc",
+                            "Temp. Ins. (C)": "temp_c",
+                            "Temp. Max. (C)": "temp_max_c",
+                            "Temp. Min. (C)": "temp_min_c",
+                            "Umi. Ins. (%)": "umid_pct",
+                            "Umi. Max. (%)": "umid_max_pct",
+                            "Umi. Min. (%)": "umid_min_pct",
+                            "Pto Orvalho Ins. (C)": "pto_orvalho_c",
+                            "Pto Orvalho Max. (C)": "pto_orvalho_max_c",
+                            "Pto Orvalho Min. (C)": "pto_orvalho_min_c",
+                            "Pres. Ins. (hPa)": "press_hpa",
+                            "Pres. Max. (hPa)": "press_max_hpa",
+                            "Pres. Min. (hPa)": "press_min_hpa",
+                            "Vel. Vento (m/s)": "vento_ms",
+                            "Raj. Vento (m/s)": "raj_vento_ms",
+                            "Radiacao (KJ/m²)": "radiacao_kj_m2",
+                            "Chuva (mm)": "chuva_mm",}, 
+                    inplace = True)
+        
+        # Fazendo merge com df_loc_estacoes para pegar latitude e longitude
+        if 'cod_estacao' in df.columns and 'CD_ESTACAO' in df_loc_estacoes.columns:
+            df = df.merge(
+                df_loc_estacoes[['CD_ESTACAO', 'VL_LATITUDE', 'VL_LONGITUDE']],
+                left_on='cod_estacao',
+                right_on='CD_ESTACAO',
+                how='left'
+            )
+            # Remove a coluna CD_ESTACAO duplicada (já temos cod_estacao)
+            df.drop(columns=['CD_ESTACAO'], inplace=True, errors='ignore')
+        
+        
+        
+    return df

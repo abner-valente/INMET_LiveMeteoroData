@@ -1,6 +1,6 @@
 import time
 import os
-from funcs import _slugify_filename
+from funcs import _slugify_filename, mdf_df_estacao
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 from playwright._impl._errors import TimeoutError
@@ -19,6 +19,16 @@ logging.basicConfig(
 URL = "https://tempo.inmet.gov.br/TabelaEstacoes/"
 
 
+ # Lendo arquivo loc_estacoes.csv para obter os códigos das estações
+try:
+    df_loc_estacoes = pd.read_csv("loc_estacoes.csv", encoding='utf-8', sep=';')
+    cod_estacao_map = dict(zip(df_loc_estacoes['CD_ESTACAO'], df_loc_estacoes['DC_NOME']))
+    logging.info(f"Arquivo loc_estacoes.csv carregado com sucesso. {len(cod_estacao_map)} estações mapeadas.")
+except Exception as e:
+    logging.error(f"Erro ao carregar loc_estacoes.csv: {e}")
+    df_loc_estacoes = pd.DataFrame()  # Cria um DataFrame vazio
+    cod_estacao_map = {}
+
 # Define a pasta de saída dentro do projeto
 pasta_downloads = os.path.join(os.path.dirname(__file__), "downloads")
 
@@ -27,7 +37,7 @@ os.makedirs(pasta_downloads, exist_ok=True)
 
 
 with sync_playwright() as p:
-    
+        
     logging.info("Iniciando o navegador")
     navegador = p.chromium.launch(headless=False)
     pagina = navegador.new_page()
@@ -104,10 +114,16 @@ with sync_playwright() as p:
             safe_name = _slugify_filename(nome_estacao)
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             custom_filename = f"{safe_name}_{timestamp}.csv"
-
+            
             # Salva o arquivo na pasta Downloads com nome customizado
             caminho_arquivo = os.path.join(pasta_downloads, custom_filename)
             download.save_as(caminho_arquivo)
+            
+            df_estacao = pd.read_csv(caminho_arquivo, sep=';', encoding='utf-8')
+            
+            #inserindo coluna do código da estação     
+            df_estacao = mdf_df_estacao(nome_estacao, df_estacao, df_loc_estacoes)
+            df_estacao.to_csv(caminho_arquivo, index=False, encoding='utf-8', sep=';')
 
             print(f"Arquivo baixado com sucesso: {caminho_arquivo}")
         
