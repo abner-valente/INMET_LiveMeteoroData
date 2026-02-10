@@ -1,6 +1,10 @@
 import time
 import os
+<<<<<<< HEAD
 from funcs import _slugify_filename, mdf_df_estacao
+=======
+from funcs import _slugify_filename
+>>>>>>> 9978339c2a1e1779bdc627e6528029ca1b0f1ddc
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 from playwright._impl._errors import TimeoutError
@@ -19,6 +23,7 @@ logging.basicConfig(
 URL = "https://tempo.inmet.gov.br/TabelaEstacoes/"
 
 
+<<<<<<< HEAD
  # Lendo arquivo loc_estacoes.csv para obter os códigos das estações
 try:
     df_loc_estacoes = pd.read_csv("loc_estacoes.csv", encoding='utf-8', sep=';')
@@ -29,6 +34,8 @@ except Exception as e:
     df_loc_estacoes = pd.DataFrame()  # Cria um DataFrame vazio
     cod_estacao_map = {}
 
+=======
+>>>>>>> 9978339c2a1e1779bdc627e6528029ca1b0f1ddc
 # Define a pasta de saída dentro do projeto
 pasta_downloads = os.path.join(os.path.dirname(__file__), "downloads")
 
@@ -37,7 +44,11 @@ os.makedirs(pasta_downloads, exist_ok=True)
 
 
 with sync_playwright() as p:
+<<<<<<< HEAD
         
+=======
+    
+>>>>>>> 9978339c2a1e1779bdc627e6528029ca1b0f1ddc
     logging.info("Iniciando o navegador")
     navegador = p.chromium.launch(headless=False)
     pagina = navegador.new_page()
@@ -114,6 +125,7 @@ with sync_playwright() as p:
             safe_name = _slugify_filename(nome_estacao)
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             custom_filename = f"{safe_name}_{timestamp}.csv"
+<<<<<<< HEAD
             
             # Salva o arquivo na pasta Downloads com nome customizado
             caminho_arquivo = os.path.join(pasta_downloads, custom_filename)
@@ -124,6 +136,12 @@ with sync_playwright() as p:
             #inserindo coluna do código da estação     
             df_estacao = mdf_df_estacao(nome_estacao, df_estacao, df_loc_estacoes)
             df_estacao.to_csv(caminho_arquivo, index=False, encoding='utf-8', sep=';')
+=======
+
+            # Salva o arquivo na pasta Downloads com nome customizado
+            caminho_arquivo = os.path.join(pasta_downloads, custom_filename)
+            download.save_as(caminho_arquivo)
+>>>>>>> 9978339c2a1e1779bdc627e6528029ca1b0f1ddc
 
             print(f"Arquivo baixado com sucesso: {caminho_arquivo}")
         
