@@ -1,2 +1,11 @@
 /downloads
 /pytest_cache
+automation_log.log
+.env
+/.vscode
+__pycache__/
+.pytest_cache/
+*.pyc
+/logs/
+/saida/
+x.ipynb
