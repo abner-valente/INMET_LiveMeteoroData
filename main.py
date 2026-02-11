@@ -1,10 +1,13 @@
 import time
 import os
+import shutil
+import glob
+import geopandas as gpd
+from shapely.geometry import Point
 from funcs import _slugify_filename, mdf_df_estacao
-from pathlib import Path
 from playwright.sync_api import sync_playwright
 from playwright._impl._errors import TimeoutError
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from playwright.sync_api import sync_playwright, TimeoutError
 import pandas as pd
@@ -35,6 +38,14 @@ pasta_downloads = os.path.join(os.path.dirname(__file__), "downloads")
 
 # Cria a pasta se não existir
 os.makedirs(pasta_downloads, exist_ok=True)
+
+#apagar arquivos antigos da pasta downloads
+for nome in os.listdir(pasta_downloads):
+    caminho = os.path.join(pasta_downloads, nome)
+    if os.path.isfile(caminho) or os.path.islink(caminho):
+        os.remove(caminho)
+    elif os.path.isdir(caminho):
+        shutil.rmtree(caminho)
 
 
 with sync_playwright() as p:
@@ -122,8 +133,8 @@ with sync_playwright() as p:
             
             df_estacao = pd.read_csv(caminho_arquivo, sep=';', encoding='utf-8')
             
-            #inserindo coluna do código da estação     
-            df_estacao = mdf_df_estacao(nome_estacao, df_estacao, df_loc_estacoes)
+            # Modificando o DF da acordo com o padrão da equipe    
+            df_estacao = mdf_df_estacao(nome_estacao, df_estacao, df_loc_estacoes, time_delta=2)
             df_estacao.to_csv(caminho_arquivo, index=False, encoding='utf-8', sep=';')
 
             print(f"Arquivo baixado com sucesso: {caminho_arquivo}")
@@ -135,5 +146,42 @@ with sync_playwright() as p:
     
     navegador.close()
 
+# unificando os arquivos baixados em um único DataFrame
+arq = glob.glob('downloads/*.csv')
+df_unificado = pd.concat([pd.read_csv(f, sep=';', encoding='utf-8') for f in arq], ignore_index=True)
+logging.info(f"{len(arq)} arquivos CSV encontrados e unificados em um DataFrame com {len(df_unificado)} registros.")
+print(f"{len(arq)} arquivos CSV encontrados e unificados em um DataFrame com {len(df_unificado)} registros.")
 
-    
+
+# Salvando em .csv
+df_unificado.to_csv(F'INMET_{datetime.now().strftime('%H') + '00'}_UTC.csv', index=False, sep=';', encoding='utf-8')
+logging.info(f"Arquivo unificado salvo como INMET_{datetime.now().strftime('%H') + '00'}_UTC.csv")
+print(f"Arquivo unificado salvo como INMET_{datetime.now().strftime('%H') + '00'}_UTC.csv")
+
+# Processo para gerar o arquivo .geojson
+# Tratamentos de formatação de latitude e longitude
+logging.info("Iniciando processo de conversão para GeoJSON")
+print("Iniciando processo de conversão para GeoJSON")
+df_unificado['VL_LONGITUDE'] = (
+    df_unificado['VL_LONGITUDE']
+    .astype(str)
+    .str.replace(',', '.', regex=False)
+)
+df_unificado['VL_LATITUDE'] = (
+    df_unificado['VL_LATITUDE']
+    .astype(str)
+    .str.replace(',', '.', regex=False)
+)
+df_unificado['VL_LONGITUDE'] = pd.to_numeric(df_unificado['VL_LONGITUDE'], errors='coerce')
+df_unificado['VL_LATITUDE'] = pd.to_numeric(df_unificado['VL_LATITUDE'], errors='coerce')
+
+df_unificado = df_unificado.dropna(subset=['VL_LATITUDE', 'VL_LONGITUDE'])
+geometry = [Point(float(lon), float(lat)) for lon, lat in zip(df_unificado['VL_LONGITUDE'], df_unificado['VL_LATITUDE'])]
+gdf = gpd.GeoDataFrame(df_unificado, geometry=geometry, crs='EPSG:4326')
+gdf.to_file(f'INMET_{(datetime.now() - timedelta(hours=2)).strftime("%H") + "00"}_UTC.geojson', driver='GeoJSON')
+
+logging.info(f"Processo de conversão para GeoJSON concluído. Arquivo salvo como INMET_{(datetime.now() - timedelta(hours=2)).strftime('%H') + '00'}_UTC.geojson")
+print(f"Processo de conversão para GeoJSON concluído. Arquivo salvo como INMET_{(datetime.now() - timedelta(hours=2)).strftime('%H') + '00'}_UTC.geojson")
+
+
+

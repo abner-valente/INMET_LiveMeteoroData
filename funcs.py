@@ -1,8 +1,6 @@
-from playwright.sync_api import sync_playwright
-import time
 import re
 import pandas as pd
-
+from datetime import datetime, timezone, timedelta
 
 
 def _slugify_filename(name: str) -> str:
@@ -13,7 +11,7 @@ def _slugify_filename(name: str) -> str:
     # Limita tamanho para evitar problemas de caminho
     return name[:120] or "arquivo"
 
-def mdf_df_estacao(nome_estacao: str, df: pd.DataFrame, df_loc_estacoes: pd.DataFrame) -> pd.DataFrame:
+def mdf_df_estacao(nome_estacao: str, df: pd.DataFrame, df_loc_estacoes: pd.DataFrame, time_delta: int = 0) -> pd.DataFrame:
     if nome_estacao:
         match = re.search(r'\(([SA]\d{3})\)', nome_estacao)
         if match:
@@ -32,11 +30,12 @@ def mdf_df_estacao(nome_estacao: str, df: pd.DataFrame, df_loc_estacoes: pd.Data
                             "Pto Orvalho Ins. (C)": "pto_orvalho_c",
                             "Pto Orvalho Max. (C)": "pto_orvalho_max_c",
                             "Pto Orvalho Min. (C)": "pto_orvalho_min_c",
-                            "Pres. Ins. (hPa)": "press_hpa",
-                            "Pres. Max. (hPa)": "press_max_hpa",
-                            "Pres. Min. (hPa)": "press_min_hpa",
+                            "Pressao Ins. (hPa)": "press_hpa",
+                            "Pressao Max. (hPa)": "press_max_hpa",
+                            "Pressao Min. (hPa)": "press_min_hpa",
                             "Vel. Vento (m/s)": "vento_ms",
                             "Raj. Vento (m/s)": "raj_vento_ms",
+                            "Dir. Vento (m/s)" : "dir_vento_ms",
                             "Radiacao (KJ/m²)": "radiacao_kj_m2",
                             "Chuva (mm)": "chuva_mm",}, 
                     inplace = True)
@@ -52,6 +51,16 @@ def mdf_df_estacao(nome_estacao: str, df: pd.DataFrame, df_loc_estacoes: pd.Data
             # Remove a coluna CD_ESTACAO duplicada (já temos cod_estacao)
             df.drop(columns=['CD_ESTACAO'], inplace=True, errors='ignore')
         
+        # Padronizando hora_utc para 4 dígitos (0900, 0500, etc)
+        if 'hora_utc' in df.columns:
+            df['hora_utc'] = df['hora_utc'].astype(str).str.zfill(4)
         
+        # Filtrando apenas registros onde hora_utc = agora (considerando time_delta)
+        hora_utc = datetime.now(timezone.utc) - timedelta(hours=time_delta)
+        agora = hora_utc.strftime('%H') + '00'
+        
+        if 'hora_utc' in df.columns:
+            df = df[df['hora_utc'] == agora]
+                    
         
     return df
