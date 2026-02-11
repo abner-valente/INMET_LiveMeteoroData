@@ -41,15 +41,18 @@ def mdf_df_estacao(nome_estacao: str, df: pd.DataFrame, df_loc_estacoes: pd.Data
                     inplace = True)
         
         # Fazendo merge com df_loc_estacoes para pegar latitude e longitude
-        if 'cod_estacao' in df.columns and 'CD_ESTACAO' in df_loc_estacoes.columns:
-            df = df.merge(
-                df_loc_estacoes[['CD_ESTACAO', 'VL_LATITUDE', 'VL_LONGITUDE']],
-                left_on='cod_estacao',
-                right_on='CD_ESTACAO',
-                how='left'
-            )
-            # Remove a coluna CD_ESTACAO duplicada (já temos cod_estacao)
-            df.drop(columns=['CD_ESTACAO'], inplace=True, errors='ignore')
+        try:
+            if 'cod_estacao' in df.columns and 'CD_ESTACAO' in df_loc_estacoes.columns:
+                df = df.merge(
+                    df_loc_estacoes[['CD_ESTACAO', 'VL_LATITUDE', 'VL_LONGITUDE']],
+                    left_on='cod_estacao',
+                    right_on='CD_ESTACAO',
+                    how='left'
+                )
+                # Remove a coluna CD_ESTACAO duplicada (já temos cod_estacao)
+                df.drop(columns=['CD_ESTACAO'], inplace=True, errors='ignore')
+        except Exception as e:
+            print(f"Erro ao fazer merge com df_loc_estacoes: {e}")
         
         # Padronizando hora_utc para 4 dígitos (0900, 0500, etc)
         if 'hora_utc' in df.columns:
