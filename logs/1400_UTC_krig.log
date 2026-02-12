@@ -1,0 +1,84 @@
+2026-02-11 16:32:15,597 INFO Iniciando interpolação
+2026-02-11 16:38:59,800 INFO Iniciando interpolação
+2026-02-11 16:40:31,725 INFO Iniciando interpolação
+2026-02-11 16:41:33,022 INFO Iniciando interpolação
+2026-02-11 16:41:45,817 INFO temp_c: 60 estações válidas
+2026-02-11 16:41:46,005 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:44:33,497 INFO Iniciando interpolação
+2026-02-11 16:44:33,549 INFO temp_c: 60 estações válidas
+2026-02-11 16:44:38,978 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:47:18,750 INFO Iniciando interpolação
+2026-02-11 16:47:18,800 INFO temp_c: 60 estações válidas
+2026-02-11 16:47:25,402 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: Cannot find proj.db'
+2026-02-11 16:47:53,989 INFO Iniciando interpolação
+2026-02-11 16:47:54,038 INFO temp_c: 60 estações válidas
+2026-02-11 16:47:59,798 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: Cannot find proj.db'
+2026-02-11 16:49:07,064 INFO Iniciando interpolação
+2026-02-11 16:49:07,113 INFO temp_c: 60 estações válidas
+2026-02-11 16:49:15,353 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:49:16,350 WARNING CPLE_AppDefined in PROJ: proj_create_from_database: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:49:16,351 WARNING CPLE_AppDefined in PROJ: proj_create_from_name: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:49:22,850 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:49:46,960 INFO Iniciando interpolação
+2026-02-11 16:49:46,984 INFO temp_c: 60 estações válidas
+2026-02-11 16:49:47,151 WARNING CPLE_AppDefined in PROJ: proj_create_from_database: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:49:47,151 WARNING CPLE_AppDefined in PROJ: proj_create_from_name: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:49:47,166 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:49:47,185 WARNING CPLE_AppDefined in PROJ: proj_create_from_database: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:49:47,185 WARNING CPLE_AppDefined in PROJ: proj_create_from_name: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:49:47,213 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:49:47,215 INFO temp_c: raster gerado com sucesso
+2026-02-11 16:49:47,217 INFO umid_pct: 59 estações válidas
+2026-02-11 16:50:10,983 INFO Iniciando interpolação
+2026-02-11 16:50:11,033 INFO temp_c: 60 estações válidas
+2026-02-11 16:50:11,206 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:50:11,226 WARNING CPLE_AppDefined in PROJ: proj_create_from_database: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:50:11,226 WARNING CPLE_AppDefined in PROJ: proj_create_from_name: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:50:17,234 WARNING CPLE_AppDefined in PROJ: proj_create_from_database: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:50:17,234 WARNING CPLE_AppDefined in PROJ: proj_create_from_name: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:50:18,138 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:50:20,467 INFO temp_c: raster gerado com sucesso
+2026-02-11 16:50:27,950 INFO umid_pct: 59 estações válidas
+2026-02-11 16:56:06,929 INFO Iniciando interpolação
+2026-02-11 16:56:06,981 INFO temp_c: 60 estações válidas
+2026-02-11 16:56:37,139 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:56:38,072 WARNING CPLE_AppDefined in PROJ: proj_create_from_database: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:38,072 WARNING CPLE_AppDefined in PROJ: proj_create_from_name: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:43,869 WARNING CPLE_AppDefined in PROJ: proj_create_from_database: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:43,869 WARNING CPLE_AppDefined in PROJ: proj_create_from_name: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:44,568 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:56:45,909 INFO temp_c: raster gerado com sucesso
+2026-02-11 16:56:58,168 INFO Iniciando interpolação
+2026-02-11 16:56:58,195 INFO temp_c: 60 estações válidas
+2026-02-11 16:56:58,369 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:56:58,386 WARNING CPLE_AppDefined in PROJ: proj_create_from_database: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:58,387 WARNING CPLE_AppDefined in PROJ: proj_create_from_name: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:58,415 WARNING CPLE_AppDefined in PROJ: proj_create_from_database: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:58,415 WARNING CPLE_AppDefined in PROJ: proj_create_from_name: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:58,427 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:56:58,429 INFO temp_c: raster gerado com sucesso
+2026-02-11 16:56:58,430 INFO umid_pct: 59 estações válidas
+2026-02-11 16:56:58,599 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:56:58,618 WARNING CPLE_AppDefined in PROJ: proj_create_from_database: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:58,618 WARNING CPLE_AppDefined in PROJ: proj_create_from_name: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:58,637 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:56:58,639 INFO umid_pct: raster gerado com sucesso
+2026-02-11 16:56:58,640 INFO press_hpa: 60 estações válidas
+2026-02-11 16:56:58,814 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:56:58,834 WARNING CPLE_AppDefined in PROJ: proj_create_from_database: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:58,834 WARNING CPLE_AppDefined in PROJ: proj_create_from_name: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:58,852 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:56:58,854 INFO press_hpa: raster gerado com sucesso
+2026-02-11 16:56:58,855 INFO vento_ms: 56 estações válidas
+2026-02-11 16:56:59,011 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:56:59,029 WARNING CPLE_AppDefined in PROJ: proj_create_from_database: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:59,029 WARNING CPLE_AppDefined in PROJ: proj_create_from_name: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:59,046 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:56:59,048 INFO vento_ms: raster gerado com sucesso
+2026-02-11 16:56:59,050 INFO chuva_mm: 59 estações válidas
+2026-02-11 16:56:59,220 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:56:59,239 WARNING CPLE_AppDefined in PROJ: proj_create_from_database: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:59,239 WARNING CPLE_AppDefined in PROJ: proj_create_from_name: C:\Program Files\PostgreSQL\18\share\contrib\postgis-3.6\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.
+2026-02-11 16:56:59,256 INFO GDAL signalled an error: err_no=1, msg='PROJ: proj_create_from_database: C:\\Program Files\\PostgreSQL\\18\\share\\contrib\\postgis-3.6\\proj\\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 2 whereas a number >= 6 is expected. It comes from another PROJ installation.'
+2026-02-11 16:56:59,257 INFO chuva_mm: raster gerado com sucesso
+2026-02-11 16:56:59,257 INFO Interpolação finalizada
