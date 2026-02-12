@@ -9,3 +9,4 @@ __pycache__/
 /logs/
 /saida/
 x.ipynb
+/dados_horarios_interpolados/

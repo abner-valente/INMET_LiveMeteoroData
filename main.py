@@ -79,7 +79,7 @@ except Exception as e:
 with sync_playwright() as p:
         
     logging.info("Iniciando o navegador")
-    navegador = p.chromium.launch(headless=True)
+    navegador = p.chromium.launch(headless=False)
     pagina = navegador.new_page()
     pagina.goto(URL)
     logging.info(f"Acessou a URL: {URL}")
@@ -183,9 +183,9 @@ except Exception as e:
 
 # Salvando em .csv
 try:
-    df_unificado.to_csv(os.path.join(pasta_saida, f'INMET_{(datetime.now() - timedelta(hours=2)).strftime("%H") + "00"}_UTC.csv'), index=False, sep=';', encoding='utf-8')
-    logging.info(f"Arquivo unificado salvo como INMET_{datetime.now().strftime('%H') + '00'}_UTC.csv")
-    print(f"Arquivo unificado salvo como INMET_{(datetime.now()- timedelta(hours=2)).strftime('%H') + '00'}_UTC.csv")
+    df_unificado.to_csv(os.path.join(pasta_saida, f'INMET_MS_{(datetime.now() - timedelta(hours=2)).strftime("%H") + "00"}_UTC.csv'), index=False, sep=';', encoding='utf-8')
+    logging.info(f"Arquivo unificado salvo como INMET_MS_{datetime.now().strftime('%H') + '00'}_UTC.csv")
+    print(f"Arquivo unificado salvo como INMET_MS_{(datetime.now()- timedelta(hours=2)).strftime('%H') + '00'}_UTC.csv")
 except Exception as e:
     logging.error(f"Erro ao salvar arquivo unificado em CSV: {e}")
     print("Erro ao salvar arquivo unificado em CSV. Verifique as permissões de escrita no diretório.")
@@ -206,12 +206,12 @@ try:
     df_unificado = df_unificado.dropna(subset=['VL_LATITUDE', 'VL_LONGITUDE'])
     geometry = [Point(float(lon), float(lat)) for lon, lat in zip(df_unificado['VL_LONGITUDE'], df_unificado['VL_LATITUDE'])]
     gdf = gpd.GeoDataFrame(df_unificado, geometry=geometry, crs='EPSG:4326')
-    gdf.to_file(os.path.join(pasta_saida, f'INMET_{(datetime.now() - timedelta(hours=2)).strftime("%H") + "00"}_UTC.geojson'), driver='GeoJSON')
+    gdf.to_file(os.path.join(pasta_saida, f'INMET_MS_{(datetime.now() - timedelta(hours=2)).strftime("%H") + "00"}_UTC.geojson'), driver='GeoJSON')
 except Exception as e:
     logging.error(f"Erro ao converter para GeoJSON: {e} | possível causa: dados de latitude/longitude corrompidos ou estrutura do DataFrame incorreta. Verficar funcão mdf_df_estacao para garantir que os dados estão sendo processados corretamente.")
     print("Erro ao converter para GeoJSON. Verifique se os dados estão no formato correto.")
     exit()
 
-logging.info(f"Processo de conversão para GeoJSON concluído. Arquivo salvo como INMET_{(datetime.now() - timedelta(hours=2)).strftime('%H') + '00'}_UTC.geojson")
-print(f"Processo de conversão para GeoJSON concluído. Arquivo salvo como INMET_{(datetime.now() - timedelta(hours=2)).strftime('%H') + '00'}_UTC.geojson")
+logging.info(f"Processo de conversão para GeoJSON concluído. Arquivo salvo como INMET_MS_{(datetime.now() - timedelta(hours=2)).strftime('%H') + '00'}_UTC.geojson")
+print(f"Processo de conversão para GeoJSON concluído. Arquivo salvo como INMET_MS_{(datetime.now() - timedelta(hours=2)).strftime('%H') + '00'}_UTC.geojson")
 
