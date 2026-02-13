@@ -125,10 +125,10 @@ with sync_playwright() as p:
         
         # Atualiza a barra de progresso com o nome da estação
         pbar.set_postfix({"Estação": nome_estacao[:30]})
-        time.sleep(1)
+        time.sleep(0.5)
             
         pagina.click('//*[@id="root"]/div[2]/div[1]/div[2]/button') #clicar para gerar a tabela
-        time.sleep(1)
+        time.sleep(0.5)
     
         # Processo de download do arquivo CSV
         try:

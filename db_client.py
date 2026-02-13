@@ -45,7 +45,7 @@ class DBConfig:
         return (v or "").strip().strip('"').strip("'").replace("\ufeff", "")
     
     @classmethod
-    def from_env(cls, prefix: str = "DB") -> "DBConfig":
+    def from_env(cls: type[DBConfig], prefix: str = "DB") -> "DBConfig":
         """
         Cria DBConfig a partir de variáveis de ambiente com prefixo opcional.
         
@@ -65,10 +65,8 @@ class DBConfig:
         password=cls._clean(os.getenv(f"{prefix}_PASSWORD", "")),
     )
         
-        
 
-
-class DBClient:
+class DBClient: 
     """
     Cliente simples para:
     - abrir Engine
@@ -84,15 +82,20 @@ class DBClient:
         logger.info(f"DBClient inicializado: {config.dialect}+{config.driver}://{config.host}:{config.port}/{config.database}")
 
     def _build_url(self) -> str:
-        """Constrói a URL de conexão apropriada para o banco."""
+        """
+        Constrói a URL de conexão apropriada para o banco.
+        Para SQL Server com pyodbc, usa formato ODBC completo.
+        Para outros bancos, usa formato padrão.
+        """
+        
         if self.config.dialect == "mssql" and self.config.driver == "pyodbc":
             # Para SQL Server com pyodbc, usar formato ODBC completo
             available_drivers = [d for d in pyodbc.drivers() if 'SQL Server' in d]
             
             if not available_drivers:
+                logger.error("Nenhum driver ODBC para SQL Server encontrado. Verifique a instalação do driver ODBC.")
                 raise Exception("Nenhum driver ODBC para SQL Server encontrado.")
-            
-            # Preferência de drivers
+                
             preferred_order = [
                 'ODBC Driver 18 for SQL Server',
                 'ODBC Driver 17 for SQL Server',
@@ -103,17 +106,19 @@ class DBClient:
             ]
             
             selected_driver = None
-            for preferred in preferred_order:
+            
+            for preferred in preferred_order: # tenta encontrar o driver preferido na lista de drivers disponíveis possíveis
                 if preferred in available_drivers:
                     selected_driver = preferred
                     break
             
             if not selected_driver:
                 selected_driver = available_drivers[0]
+                logger.warning(f"Nenhum driver ODBC preferido encontrado. Usando o primeiro disponível: {selected_driver}")
             
             logger.info(f"Usando driver ODBC: {selected_driver}")
             
-            # Parâmetros ODBC para SQL Server (igual ao x_getBDProvidencias.py)
+            # Parâmetros ODBC para SQL Server
             params = (
                 f'DRIVER={{{selected_driver}}};'
                 f'SERVER={self.config.host},{self.config.port};'
@@ -123,6 +128,7 @@ class DBClient:
                 f'TrustServerCertificate=yes;'
             )
             return f'mssql+pyodbc:///?odbc_connect={quote_plus(params)}'
+        
         else:
             # Para outros bancos (PostgreSQL, MySQL, etc.), usar formato padrão
             # Fazer URL encoding de user e password para lidar com caracteres especiais
@@ -143,26 +149,23 @@ class DBClient:
             logger.info("Engine criado com sucesso")
         return self._engine
 
-    def query_df(
-        self,
-        sql: str,
-        params: Optional[Mapping[str, Any]] = None,
-    ) -> pd.DataFrame:
+    """
+    Métodos de execução de SQL (DDL, DML) e manipulação de DataFrames
+    """
+
+    def query_df(self, sql: str, params: Optional[Mapping[str, Any]] = None,) -> pd.DataFrame:
         """
         Executa SELECT e retorna DataFrame.
-        Use params para SQL com :param
+        Use params para SQL com :params ou %(params)s, dependendo do driver.
         """
         logger.debug("Executando query SELECT...")
         with self.engine().connect() as conn:
             df = pd.read_sql(text(sql), conn, params=params)
         logger.info(f"Query executada: {len(df)} registros retornados")
+        
         return df
 
-    def execute(
-        self,
-        sql: str,
-        params: Optional[Mapping[str, Any]] = None,
-    ) -> int:
+    def execute_ddl(self, sql: str, params: Optional[Mapping[str, Any]] = None,) -> int:
         """
         Executa comandos (INSERT/UPDATE/DELETE/DDL).
         Retorna o rowcount (quando aplicável).
@@ -172,9 +175,10 @@ class DBClient:
             result = conn.execute(text(sql), params or {})
             rowcount = result.rowcount if result.rowcount is not None else 0
         logger.info(f"Comando executado: {rowcount} linhas afetadas")
+        
         return rowcount
 
-    def to_table(
+    def df_to_table(
         self,
         df: pd.DataFrame,
         table_name: str,
