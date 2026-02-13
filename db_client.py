@@ -207,16 +207,26 @@ class DBClient:
                 chunksize = max_rows_safe
         
         logger.info(f"Inserindo {len(df)} registros na tabela {table_name} (modo: {if_exists})...")
-        df.to_sql(
-            name=table_name,
-            con=self.engine(),
-            schema=schema,
-            if_exists=if_exists,
-            index=False,
-            chunksize=chunksize,
-            method="multi",
-        )
-        logger.info(f"Inserção concluída: {len(df)} registros em {table_name}")
+        print(f"Inserindo {len(df)} registros na tabela {table_name} (modo: {if_exists})...")
+        
+        try:
+            with self.engine().begin() as conn:
+                df.to_sql(
+                    name=table_name,
+                    con=conn,
+                    schema=schema,
+                    if_exists=if_exists,
+                    index=False,
+                    chunksize=chunksize,
+                    method="multi",
+                )
+            
+            logger.info(f"Inserção concluída: {len(df)} registros em {table_name}")
+            print(f"Inserção concluída: {len(df)} registros em {table_name}")
+        except Exception as e:
+            logger.error(f"Erro ao inserir dados em {table_name}: {e}")
+            print(f"Erro ao inserir dados em {table_name}: {e}")
+            raise
 
     def dispose(self) -> None:
         """Fecha conexões do pool."""
