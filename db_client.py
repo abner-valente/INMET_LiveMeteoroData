@@ -4,7 +4,7 @@ import pyodbc
 import logging
 from dataclasses import dataclass
 from typing import Optional, Mapping, Any, Literal
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.engine import Engine
 from urllib.parse import quote_plus
 from dotenv import load_dotenv
@@ -225,3 +225,62 @@ class DBClient:
             self._engine.dispose()
             self._engine = None
             logger.info("Conexões fechadas")
+            
+    def existe_tb(self, table_name: str, schema: Optional[str] = None) -> bool:
+        """
+        Verifica se uma tabela existe no banco de dados.
+        
+        Argumentos:
+            table_name: Nome da tabela
+            schema: Schema da tabela (opcional)
+        
+        Retorna:
+            True se a tabela existe, False caso contrário
+        """        
+        
+        logger.debug(f"Verificando se tabela '{table_name}' existe...")
+        inspector = inspect(self.engine())
+        
+        if schema:
+            exists = inspector.has_table(table_name, schema=schema)
+        else:
+            exists = inspector.has_table(table_name)
+        
+        logger.info(f"Tabela '{table_name}' {'existe' if exists else 'não existe'}")
+        return exists
+        
+    def criar_tabela_bd(self, table_name: str, create_sql: str, schema: Optional[str] = None,) -> None:
+        """
+        Verifica se uma tabela existe. Se não existir, cria a estrutura.
+        
+        Argumentos:
+            table_name: Nome da tabela
+            create_sql: SQL CREATE TABLE completo
+            schema: Schema da tabela (opcional)
+        
+        Exemplo:
+            sql = '''
+            CREATE TABLE users (
+                id INT PRIMARY KEY,
+                name VARCHAR(100),
+                email VARCHAR(100)
+            )
+            '''
+            db.criar_tabela_bd('users', sql)
+        """
+        logger.info(f"Verificando estrutura da tabela '{table_name}'...")
+        
+        if not self.existe_tb(table_name, schema):
+            logger.info(f"Tabela '{table_name}' não existe. Criando...")
+            
+            try:
+                self.execute_ddl(create_sql)
+                logger.info(f"Tabela '{table_name}' criada com sucesso")
+            except Exception as e:
+                logger.error(f"Erro ao criar tabela '{table_name}': {e}")
+                raise
+        else:
+            logger.info(f"Tabela '{table_name}' já existe. Nenhuma ação necessária")
+            
+
+        

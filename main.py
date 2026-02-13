@@ -13,6 +13,9 @@ import logging
 from playwright.sync_api import sync_playwright, TimeoutError
 import pandas as pd
 
+from db_client import DBConfig, DBClient
+
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -214,4 +217,12 @@ except Exception as e:
 
 logging.info(f"Processo de conversão para GeoJSON concluído. Arquivo salvo como INMET_MS_{(datetime.now() - timedelta(hours=2)).strftime('%H') + '00'}_UTC.geojson")
 print(f"Processo de conversão para GeoJSON concluído. Arquivo salvo como INMET_MS_{(datetime.now() - timedelta(hours=2)).strftime('%H') + '00'}_UTC.geojson")
+
+##############################################################################
+# Processo de conexão e inserção dos dados trataodos no BD 🎲
+##############################################################################
+
+pg_local = DBClient(DBConfig.from_env(prefix="LOCAL_POSTGRES"))
+
+
 
