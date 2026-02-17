@@ -12,7 +12,6 @@ numpy==2.4.1
 packaging==26.0
 pandas==3.0.0
 playwright==1.57.0
-point==0.0.1
 proj==0.2.0
 psycopg==3.3.2
 pyee==13.0.0
