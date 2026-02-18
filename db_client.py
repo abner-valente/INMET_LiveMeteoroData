@@ -4,7 +4,7 @@ import pyodbc
 import logging
 from dataclasses import dataclass
 from typing import Optional, Mapping, Any, Literal
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.engine import Engine
 from urllib.parse import quote_plus
 from dotenv import load_dotenv
@@ -45,7 +45,7 @@ class DBConfig:
         return (v or "").strip().strip('"').strip("'").replace("\ufeff", "")
     
     @classmethod
-    def from_env(cls, prefix: str = "DB") -> "DBConfig":
+    def from_env(cls: type[DBConfig], prefix: str = "DB") -> "DBConfig":
         """
         Cria DBConfig a partir de variáveis de ambiente com prefixo opcional.
         
@@ -65,10 +65,8 @@ class DBConfig:
         password=cls._clean(os.getenv(f"{prefix}_PASSWORD", "")),
     )
         
-        
 
-
-class DBClient:
+class DBClient: 
     """
     Cliente simples para:
     - abrir Engine
@@ -84,15 +82,20 @@ class DBClient:
         logger.info(f"DBClient inicializado: {config.dialect}+{config.driver}://{config.host}:{config.port}/{config.database}")
 
     def _build_url(self) -> str:
-        """Constrói a URL de conexão apropriada para o banco."""
+        """
+        Constrói a URL de conexão apropriada para o banco.
+        Para SQL Server com pyodbc, usa formato ODBC completo.
+        Para outros bancos, usa formato padrão.
+        """
+        
         if self.config.dialect == "mssql" and self.config.driver == "pyodbc":
             # Para SQL Server com pyodbc, usar formato ODBC completo
             available_drivers = [d for d in pyodbc.drivers() if 'SQL Server' in d]
             
             if not available_drivers:
+                logger.error("Nenhum driver ODBC para SQL Server encontrado. Verifique a instalação do driver ODBC.")
                 raise Exception("Nenhum driver ODBC para SQL Server encontrado.")
-            
-            # Preferência de drivers
+                
             preferred_order = [
                 'ODBC Driver 18 for SQL Server',
                 'ODBC Driver 17 for SQL Server',
@@ -103,17 +106,19 @@ class DBClient:
             ]
             
             selected_driver = None
-            for preferred in preferred_order:
+            
+            for preferred in preferred_order: # tenta encontrar o driver preferido na lista de drivers disponíveis possíveis
                 if preferred in available_drivers:
                     selected_driver = preferred
                     break
             
             if not selected_driver:
                 selected_driver = available_drivers[0]
+                logger.warning(f"Nenhum driver ODBC preferido encontrado. Usando o primeiro disponível: {selected_driver}")
             
             logger.info(f"Usando driver ODBC: {selected_driver}")
             
-            # Parâmetros ODBC para SQL Server (igual ao x_getBDProvidencias.py)
+            # Parâmetros ODBC para SQL Server
             params = (
                 f'DRIVER={{{selected_driver}}};'
                 f'SERVER={self.config.host},{self.config.port};'
@@ -123,6 +128,7 @@ class DBClient:
                 f'TrustServerCertificate=yes;'
             )
             return f'mssql+pyodbc:///?odbc_connect={quote_plus(params)}'
+        
         else:
             # Para outros bancos (PostgreSQL, MySQL, etc.), usar formato padrão
             # Fazer URL encoding de user e password para lidar com caracteres especiais
@@ -143,26 +149,23 @@ class DBClient:
             logger.info("Engine criado com sucesso")
         return self._engine
 
-    def query_df(
-        self,
-        sql: str,
-        params: Optional[Mapping[str, Any]] = None,
-    ) -> pd.DataFrame:
+    """
+    Métodos de execução de SQL (DDL, DML) e manipulação de DataFrames
+    """
+
+    def query_df(self, sql: str, params: Optional[Mapping[str, Any]] = None,) -> pd.DataFrame:
         """
         Executa SELECT e retorna DataFrame.
-        Use params para SQL com :param
+        Use params para SQL com :params ou %(params)s, dependendo do driver.
         """
         logger.debug("Executando query SELECT...")
         with self.engine().connect() as conn:
             df = pd.read_sql(text(sql), conn, params=params)
         logger.info(f"Query executada: {len(df)} registros retornados")
+        
         return df
 
-    def execute(
-        self,
-        sql: str,
-        params: Optional[Mapping[str, Any]] = None,
-    ) -> int:
+    def execute_ddl(self, sql: str, params: Optional[Mapping[str, Any]] = None,) -> int:
         """
         Executa comandos (INSERT/UPDATE/DELETE/DDL).
         Retorna o rowcount (quando aplicável).
@@ -172,9 +175,10 @@ class DBClient:
             result = conn.execute(text(sql), params or {})
             rowcount = result.rowcount if result.rowcount is not None else 0
         logger.info(f"Comando executado: {rowcount} linhas afetadas")
+        
         return rowcount
 
-    def to_table(
+    def df_to_table(
         self,
         df: pd.DataFrame,
         table_name: str,
@@ -203,16 +207,26 @@ class DBClient:
                 chunksize = max_rows_safe
         
         logger.info(f"Inserindo {len(df)} registros na tabela {table_name} (modo: {if_exists})...")
-        df.to_sql(
-            name=table_name,
-            con=self.engine(),
-            schema=schema,
-            if_exists=if_exists,
-            index=False,
-            chunksize=chunksize,
-            method="multi",
-        )
-        logger.info(f"Inserção concluída: {len(df)} registros em {table_name}")
+        print(f"Inserindo {len(df)} registros na tabela {table_name} (modo: {if_exists})...")
+        
+        try:
+            with self.engine().begin() as conn:
+                df.to_sql(
+                    name=table_name,
+                    con=conn,
+                    schema=schema,
+                    if_exists=if_exists,
+                    index=False,
+                    chunksize=chunksize,
+                    method="multi",
+                )
+            
+            logger.info(f"Inserção concluída: {len(df)} registros em {table_name}")
+            print(f"Inserção concluída: {len(df)} registros em {table_name}")
+        except Exception as e:
+            logger.error(f"Erro ao inserir dados em {table_name}: {e}")
+            print(f"Erro ao inserir dados em {table_name}: {e}")
+            raise
 
     def dispose(self) -> None:
         """Fecha conexões do pool."""
@@ -221,3 +235,62 @@ class DBClient:
             self._engine.dispose()
             self._engine = None
             logger.info("Conexões fechadas")
+            
+    def existe_tb(self, table_name: str, schema: Optional[str] = None) -> bool:
+        """
+        Verifica se uma tabela existe no banco de dados.
+        
+        Argumentos:
+            table_name: Nome da tabela
+            schema: Schema da tabela (opcional)
+        
+        Retorna:
+            True se a tabela existe, False caso contrário
+        """        
+        
+        logger.debug(f"Verificando se tabela '{table_name}' existe...")
+        inspector = inspect(self.engine())
+        
+        if schema:
+            exists = inspector.has_table(table_name, schema=schema)
+        else:
+            exists = inspector.has_table(table_name)
+        
+        logger.info(f"Tabela '{table_name}' {'existe' if exists else 'não existe'}")
+        return exists
+        
+    def criar_tabela_bd(self, table_name: str, create_sql: str, schema: Optional[str] = None,) -> None:
+        """
+        Verifica se uma tabela existe. Se não existir, cria a estrutura.
+        
+        Argumentos:
+            table_name: Nome da tabela
+            create_sql: SQL CREATE TABLE completo
+            schema: Schema da tabela (opcional)
+        
+        Exemplo:
+            sql = '''
+            CREATE TABLE users (
+                id INT PRIMARY KEY,
+                name VARCHAR(100),
+                email VARCHAR(100)
+            )
+            '''
+            db.criar_tabela_bd('users', sql)
+        """
+        logger.info(f"Verificando estrutura da tabela '{table_name}'...")
+        
+        if not self.existe_tb(table_name, schema):
+            logger.info(f"Tabela '{table_name}' não existe. Criando...")
+            
+            try:
+                self.execute_ddl(create_sql)
+                logger.info(f"Tabela '{table_name}' criada com sucesso")
+            except Exception as e:
+                logger.error(f"Erro ao criar tabela '{table_name}': {e}")
+                raise
+        else:
+            logger.info(f"Tabela '{table_name}' já existe. Nenhuma ação necessária")
+            
+
+        
