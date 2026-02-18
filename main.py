@@ -82,7 +82,7 @@ except Exception as e:
 with sync_playwright() as p:
         
     logging.info("Iniciando o navegador")
-    navegador = p.chromium.launch(headless=False)
+    navegador = p.chromium.launch(headless=True)
     pagina = navegador.new_page()
     pagina.goto(URL)
     logging.info(f"Acessou a URL: {URL}")
