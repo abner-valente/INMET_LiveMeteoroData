@@ -1,5 +1,6 @@
 import re
 import pandas as pd
+import numpy as np
 from datetime import datetime, timezone, timedelta
 
 
@@ -64,6 +65,29 @@ def mdf_df_estacao(nome_estacao: str, df: pd.DataFrame, df_loc_estacoes: pd.Data
         
         if 'hora_utc' in df.columns:
             df = df[df['hora_utc'] == agora]
-                    
+            
+        df.columns = [c.lower() for c in df.columns]
+        
+    colunas_float = [
+    "temp_c", "temp_max_c", "temp_min_c",
+    "umid_pct", "umid_max_pct", "umid_min_pct",
+    "pto_orvalho_c", "pto_orvalho_max_c", "pto_orvalho_min_c",
+    "press_hpa", "press_max_hpa", "press_min_hpa",
+    "vento_ms", "dir_vento_ms", "raj_vento_ms",
+    "radiacao_kj_m2", "chuva_mm",
+    "vl_latitude", "vl_longitude"]
+
+    for col in colunas_float:
+        if col in df.columns:
+            df[col] = (
+                df[col]
+                .astype(str)
+                .str.replace(",", ".", regex=False)
+                .str.replace(" ", "", regex=False)
+            )
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    # 5️⃣ Limpar strings vazias
+    df = df.replace(r"^\s*$", np.nan, regex=True)
         
     return df

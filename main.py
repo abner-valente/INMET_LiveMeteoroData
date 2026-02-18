@@ -13,6 +13,9 @@ import logging
 from playwright.sync_api import sync_playwright, TimeoutError
 import pandas as pd
 
+from db_client import DBConfig, DBClient
+
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -79,7 +82,7 @@ except Exception as e:
 with sync_playwright() as p:
         
     logging.info("Iniciando o navegador")
-    navegador = p.chromium.launch(headless=False)
+    navegador = p.chromium.launch(headless=True)
     pagina = navegador.new_page()
     pagina.goto(URL)
     logging.info(f"Acessou a URL: {URL}")
@@ -125,10 +128,10 @@ with sync_playwright() as p:
         
         # Atualiza a barra de progresso com o nome da estação
         pbar.set_postfix({"Estação": nome_estacao[:30]})
-        time.sleep(1)
+        time.sleep(0.5)
             
         pagina.click('//*[@id="root"]/div[2]/div[1]/div[2]/button') #clicar para gerar a tabela
-        time.sleep(1)
+        time.sleep(0.5)
     
         # Processo de download do arquivo CSV
         try:
@@ -197,14 +200,14 @@ except Exception as e:
 try:
     logging.info("Iniciando processo de conversão para GeoJSON")
     print("Iniciando processo de conversão para GeoJSON")
-    df_unificado['VL_LONGITUDE'] = (df_unificado['VL_LONGITUDE'].astype(str).str.replace(',', '.', regex=False))
-    df_unificado['VL_LATITUDE'] = (df_unificado['VL_LATITUDE'].astype(str).str.replace(',', '.', regex=False))
+    df_unificado['vl_longitude'] = (df_unificado['vl_longitude'].astype(str).str.replace(',', '.', regex=False))
+    df_unificado['vl_latitude'] = (df_unificado['vl_latitude'].astype(str).str.replace(',', '.', regex=False))
     
-    df_unificado['VL_LONGITUDE'] = pd.to_numeric(df_unificado['VL_LONGITUDE'], errors='coerce')
-    df_unificado['VL_LATITUDE'] = pd.to_numeric(df_unificado['VL_LATITUDE'], errors='coerce')
+    df_unificado['vl_longitude'] = pd.to_numeric(df_unificado['vl_longitude'], errors='coerce')
+    df_unificado['vl_latitude'] = pd.to_numeric(df_unificado['vl_latitude'], errors='coerce')
 
-    df_unificado = df_unificado.dropna(subset=['VL_LATITUDE', 'VL_LONGITUDE'])
-    geometry = [Point(float(lon), float(lat)) for lon, lat in zip(df_unificado['VL_LONGITUDE'], df_unificado['VL_LATITUDE'])]
+    df_unificado = df_unificado.dropna(subset=['vl_latitude', 'vl_longitude'])
+    geometry = [Point(float(lon), float(lat)) for lon, lat in zip(df_unificado['vl_longitude'], df_unificado['vl_latitude'])]
     gdf = gpd.GeoDataFrame(df_unificado, geometry=geometry, crs='EPSG:4326')
     gdf.to_file(os.path.join(pasta_saida, f'INMET_MS_{(datetime.now() - timedelta(hours=2)).strftime("%H") + "00"}_UTC.geojson'), driver='GeoJSON')
 except Exception as e:
@@ -215,3 +218,72 @@ except Exception as e:
 logging.info(f"Processo de conversão para GeoJSON concluído. Arquivo salvo como INMET_MS_{(datetime.now() - timedelta(hours=2)).strftime('%H') + '00'}_UTC.geojson")
 print(f"Processo de conversão para GeoJSON concluído. Arquivo salvo como INMET_MS_{(datetime.now() - timedelta(hours=2)).strftime('%H') + '00'}_UTC.geojson")
 
+##############################################################################
+# Processo de conexão e inserção dos dados trataodos no BD 🎲
+##############################################################################
+
+print("Iniciando processo de inserção dos dados no banco de dados")
+logging.info("Iniciando processo de inserção dos dados no banco de dados")
+
+create_tb = """
+CREATE TABLE IF NOT EXISTS public.inmet_ms_utc (
+    id              BIGSERIAL PRIMARY KEY,
+
+    data            DATE NOT NULL,
+    hora_utc        INTEGER NOT NULL,
+
+    temp_c              DOUBLE PRECISION,
+    temp_max_c          DOUBLE PRECISION,
+    temp_min_c          DOUBLE PRECISION,
+
+    umid_pct            DOUBLE PRECISION,
+    umid_max_pct        DOUBLE PRECISION,
+    umid_min_pct        DOUBLE PRECISION,
+
+    pto_orvalho_c       DOUBLE PRECISION,
+    pto_orvalho_max_c   DOUBLE PRECISION,
+    pto_orvalho_min_c   DOUBLE PRECISION,
+
+    press_hpa           DOUBLE PRECISION,
+    press_max_hpa       DOUBLE PRECISION,
+    press_min_hpa       DOUBLE PRECISION,
+
+    vento_ms            DOUBLE PRECISION,
+    dir_vento_ms        DOUBLE PRECISION,
+    raj_vento_ms        DOUBLE PRECISION,
+
+    radiacao_kj_m2      DOUBLE PRECISION,
+    chuva_mm            DOUBLE PRECISION,
+
+    cod_estacao     VARCHAR(10) NOT NULL,
+
+    vl_latitude     DOUBLE PRECISION,
+    vl_longitude    DOUBLE PRECISION,
+
+    data_insercao   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    -- opcional, mas recomendo MUITO para evitar duplicidades
+    CONSTRAINT uq_inmet_ms_utc UNIQUE (cod_estacao, data, hora_utc)
+);
+
+CREATE INDEX IF NOT EXISTS idx_inmet_ms_utc_cod_estacao
+    ON public.inmet_ms_utc (cod_estacao);
+
+CREATE INDEX IF NOT EXISTS idx_inmet_ms_utc_data
+    ON public.inmet_ms_utc (data);
+
+CREATE INDEX IF NOT EXISTS idx_inmet_ms_utc_cod_estacao_data
+    ON public.inmet_ms_utc (cod_estacao, data);
+        """
+
+df_bd = pd.read_csv(f'saida/INMET_MS_{(datetime.now() - timedelta(hours=2)).strftime("%H") + "00"}_UTC.csv', sep=";", encoding="utf-8")
+df_bd["data"] = pd.to_datetime(df_bd["data"], format="%d/%m/%Y", errors="coerce").dt.date
+
+pg_local = DBClient(DBConfig.from_env(prefix="LOCAL_POSTGRES"))
+
+pg_local.criar_tabela_bd(table_name="inmet_ms_utc", create_sql=create_tb, schema="public")
+
+pg_local.df_to_table(df_bd, table_name="inmet_ms_utc", schema="public")
+
+logging.info("Processo de inserção dos dados no banco de dados concluído.")
+print("Processo de inserção dos dados no banco de dados concluído.")

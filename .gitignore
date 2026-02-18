@@ -6,6 +6,8 @@ automation_log.log
 __pycache__/
 .pytest_cache/
 *.pyc
+*.geojson
+*.csv
 /logs/
 /saida/
 x.ipynb

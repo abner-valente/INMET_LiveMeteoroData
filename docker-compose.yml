@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgis/postgis:13-3.4
+    container_name: pg_postgis_13
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "15432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: py_app
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # use essa URL no seu código (psycopg2/sqlalchemy)
+      DATABASE_URL: postgresql://postgres:123456@db:5432/postgres
+    restart: unless-stopped
+
+  scheduler:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    command: >
+      sh -lc "
+        while true; do
+          echo \"[$$(date)] Rodando coleta...\";
+          python app/main.py || echo \"[$$(date)] ERRO na execução\";
+          echo \"[$$(date)] Dormindo 1h...\";
+          sleep 3600;
+        done
+      "
+    restart: unless-stopped
+
+volumes:
+  pgdata:
