@@ -279,9 +279,12 @@ CREATE INDEX IF NOT EXISTS idx_inmet_ms_utc_cod_estacao_data
 df_bd = pd.read_csv(f'saida/INMET_MS_{(datetime.now() - timedelta(hours=2)).strftime("%H") + "00"}_UTC.csv', sep=";", encoding="utf-8")
 df_bd["data"] = pd.to_datetime(df_bd["data"], format="%d/%m/%Y", errors="coerce").dt.date
 
-pg_local = DBClient(DBConfig.from_env(prefix="LOCAL_POSTGRES"))
+pg_local = DBClient(DBConfig.from_env(prefix="CONTAINER_POSTGRES"))
 
-pg_local.criar_tabela_bd(table_name="inmet_ms_utc", create_sql=create_tb, schema="public")
+tb_existe = pg_local.existe_tb('inmet_ms_utc', schema="public")
+
+if not tb_existe:
+    pg_local.criar_tabela_bd(table_name="inmet_ms_utc", create_sql=create_tb, schema="public")
 
 pg_local.df_to_table(df_bd, table_name="inmet_ms_utc", schema="public")
 

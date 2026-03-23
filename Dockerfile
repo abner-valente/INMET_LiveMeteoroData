@@ -25,6 +25,4 @@ RUN playwright install --with-deps chromium
 # Copia o projeto
 COPY . /app
 
-# ✅ AJUSTE AQUI o comando do seu projeto:
-# Ex: CMD ["python", "main.py"]
 CMD ["python", "main.py"]
