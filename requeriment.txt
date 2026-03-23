@@ -32,7 +32,6 @@ pathlib_abc==0.5.2
 pillow==12.1.1
 platformdirs==4.9.2
 playwright==1.57.0
-point==0.0.1
 pooch==1.9.0
 proj==0.2.0
 psycopg==3.3.2
