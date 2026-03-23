@@ -1,14 +1,21 @@
 from __future__ import annotations
+
+import sys
+print(sys.executable)
+
 import pandas as pd
+import geopandas as gpd
 import pyodbc
 import logging
 from dataclasses import dataclass
-from typing import Optional, Mapping, Any, Literal
+from typing import Optional, Mapping, Any, Literal, cast
 from sqlalchemy import create_engine, text, inspect
 from sqlalchemy.engine import Engine
 from urllib.parse import quote_plus
 from dotenv import load_dotenv
 import os
+import sys
+from datetime import datetime, timezone
 
 load_dotenv(encoding="utf-8") #carrega variaveis do .env
 
@@ -228,6 +235,28 @@ class DBClient:
             print(f"Erro ao inserir dados em {table_name}: {e}")
             raise
 
+    def gdf_to_table(
+    self,
+    gdf: gpd.GeoDataFrame,
+    table_name: str,
+    schema: Optional[str] = None,
+    if_exists: Literal["fail", "replace", "append"] = "append",
+    chunksize: int = 1000,
+    ) -> None:
+        try:
+            with self.engine().begin() as conn:
+                gdf.to_postgis(
+                    name=table_name,
+                    con=conn,
+                    schema=schema,
+                    if_exists=if_exists,
+                    index=False,
+                    chunksize=chunksize,
+                )
+        except Exception as e:
+            logger.error(f"Erro ao inserir GeoDataFrame em {table_name}: {e}")
+            raise
+
     def dispose(self) -> None:
         """Fecha conexões do pool."""
         if self._engine is not None:
@@ -292,5 +321,3 @@ class DBClient:
         else:
             logger.info(f"Tabela '{table_name}' já existe. Nenhuma ação necessária")
             
-
-        
