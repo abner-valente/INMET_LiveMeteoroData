@@ -5,7 +5,7 @@ import shutil
 import glob
 import geopandas as gpd
 from shapely.geometry import Point
-from funcs import _slugify_filename, mdf_df_estacao
+#from funcs import _slugify_filename, mdf_df_estacao
 from playwright.sync_api import sync_playwright
 from playwright._impl._errors import TimeoutError
 from datetime import datetime, timedelta
